@@ -6,16 +6,16 @@ tf.config.experimental.set_virtual_device_configuration(
   gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4 * 1024)]
 )
 
-import numpy as np
-
 from Pendulum.PendulumEnviroment import PendulumEnviroment
-from Pendulum.DQNModels import createSimpleModel
+from Pendulum.DQNModels import createFatModel
 
 from Utils import emulate, plotData2file
 from Utils.CExperienceMemory import CExperienceMemory
 from Utils.DQNAgent import DQNAgent
 from Utils.RandomAgent import RandomAgent
 from Utils.MappedActions import MappedActions
+
+from Pendulum.DQN_bootstrap.trainingStage import train
 from Pendulum import Utils
 
 metrics = {}
@@ -31,35 +31,33 @@ print('random experience collected')
 #######################################
 # train agent
 BATCH_SIZE = 512
-TRAIN_EPISODES = 50
+TRAIN_EPISODES = 25
 TEST_EPISODES = 256
-EXPLORE_RATE = .5
-EXPLORE_RATE_DECAY = .9
+EXPLORE_RATE = .5 
+EXPLORE_RATE_DECAY = .95
 EPOCHS = 1000
 GAMMA = .9
-ACTIONS = MappedActions(N=2, valuesRange=(-1, 1))
+ACTIONS = MappedActions(N=9, valuesRange=(-1, 1))
 
-model = createSimpleModel(input_shape=(3,), output_size=ACTIONS.N)
+model = createFatModel(input_shape=(3,), output_size=ACTIONS.N)
 model.compile(optimizer=tf.optimizers.Adam(lr=1e-4), loss='mean_squared_error')
-modelClone = tf.keras.models.clone_model(model)
 
+BOOTSTRAPPED_STEPS = 10
 for epoch in range(EPOCHS):
   print('Start of %d epoch. Explore rate: %.3f' % (epoch, EXPLORE_RATE))
-  # for stability
-  modelClone.set_weights(model.get_weights())
-  lossSum = 0
-  for _ in range(TRAIN_EPISODES):
-    states, actions, rewards, nextStates, nextStateScoreMultiplier = memory.sampleBatch(
-      batch_size=BATCH_SIZE, maxSamplesFromEpisode=16
-    )
-    actions = ACTIONS.toIndex(actions)
-    
-    futureScores = modelClone.predict(nextStates).max(axis=-1) * nextStateScoreMultiplier
-    targets = modelClone.predict(states)
-    targets[np.arange(len(targets)), actions] = rewards + futureScores * GAMMA
-
-    lossSum += model.fit(states, targets, epochs=1, verbose=0).history['loss'][0]
-  print('Avg. train loss: %.4f' % (lossSum / TRAIN_EPISODES))
+  ##################
+  # Training
+  trainLoss = train(
+    model, memory,
+    {
+      'gamma': GAMMA,
+      'actions': ACTIONS,
+      'batchSize': BATCH_SIZE,
+      'episodes': TRAIN_EPISODES,
+      'steps': BOOTSTRAPPED_STEPS
+    }
+  )
+  print('Avg. train loss: %.4f' % trainLoss)
   ##################
   print('Testing...')
   scores = Utils.testAgent(
