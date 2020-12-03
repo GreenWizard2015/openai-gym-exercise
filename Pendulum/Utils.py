@@ -22,7 +22,7 @@ def testAgent(agent, memory, episodes):
 
 def trackScores(scores, metrics, levels=[.1, .5, .9]):
   if 'scores' not in metrics:
-    metrics['scores'] = []
+    metrics['scores'] = {}
     
   def series(name):
     if name not in metrics['scores']:
@@ -33,7 +33,7 @@ def trackScores(scores, metrics, levels=[.1, .5, .9]):
   orderedScores = list(sorted(scores, reverse=True))
   totalScores = sum(scores) / N
   print('Avg. test score: %.1f' % (totalScores))
-  metrics['scores']['avg.'].append(totalScores)
+  series('avg.').append(totalScores)
   
   for level in levels:
     series('top %.0f%%' % (level * 100)).append(orderedScores[int(N * level)])
