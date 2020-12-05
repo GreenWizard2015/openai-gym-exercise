@@ -10,7 +10,7 @@ from Pendulum.PendulumEnviroment import PendulumEnviroment
 from Pendulum.DQNModels import createFatModel
 
 from Utils import emulate, plotData2file
-from Utils.CExperienceMemory import CExperienceMemory
+from Utils.ExperienceBuffers import CebPrioritized
 from Utils.DQNAgent import DQNAgent
 from Utils.RandomAgent import RandomAgent
 from Utils.MappedActions import MappedActions
@@ -21,7 +21,7 @@ from Pendulum import Utils
 metrics = {}
 
 env = PendulumEnviroment()
-memory = CExperienceMemory(maxSize=5000, sampleWeight='abs')
+memory = CebPrioritized(maxSize=5000, sampleWeight='abs')
 # collect random experience
 agent = RandomAgent(low=-1, high=1)
 for episodeN in range(1000):

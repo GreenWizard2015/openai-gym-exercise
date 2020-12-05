@@ -9,7 +9,7 @@ _WEIGHTS_MODES = {
   'same': lambda _: 1
 }
 
-class CExperienceMemory:
+class CebPrioritized:
   def __init__(self, maxSize, sampleWeight='abs'):
     self.maxSize = maxSize
     self.sizeLimit = math.floor(maxSize * 1.1)
