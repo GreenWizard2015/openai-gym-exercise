@@ -75,7 +75,7 @@ for epoch in range(EPOCHS):
       
       'curiousity update rate': 5,
       'curiousity range': BOOTSTRAPPED_STEPS,
-      'curiousity function': lambda V, x: V + numpy.abs(V * x.sum(axis=-1)),
+      'curiousity function': lambda V, x: V + x.max(axis=-1),
     }
   )
   print('Avg. train loss: %.4f' % trainLoss)
