@@ -8,7 +8,7 @@ tf.config.experimental.set_virtual_device_configuration(
 
 import numpy as np
 
-from Pendulum.PendulumEnviroment import PendulumEnviroment
+from Pendulum.PendulumEnvironment import PendulumEnvironment
 from Pendulum.DQNModels import createSimpleModel
 
 from Utils import emulate, plotData2file
@@ -20,7 +20,7 @@ from Pendulum import Utils
 
 metrics = {}
 
-env = PendulumEnviroment()
+env = PendulumEnvironment()
 memory = CebPrioritized(maxSize=5000, sampleWeight='abs')
 # collect random experience
 agent = RandomAgent(low=-1, high=1)

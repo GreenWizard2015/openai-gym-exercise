@@ -7,7 +7,7 @@ tf.config.experimental.set_virtual_device_configuration(
   gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=2 * 1024)]
 )
 
-from Pendulum.PendulumEnviroment import PendulumEnviroment
+from Pendulum.PendulumEnvironment import PendulumEnvironment
 from Pendulum.DQNModels import createFatModel
 
 from Utils import emulate, plotData2file
@@ -34,7 +34,7 @@ def createCuriousityModel():
 
 metrics = {}
 
-env = PendulumEnviroment()
+env = PendulumEnvironment()
 memory = EB.CebPrioritized(maxSize=5000, sampleWeight='abs')
 # collect random experience
 agent = RandomAgent(low=-1, high=1)
