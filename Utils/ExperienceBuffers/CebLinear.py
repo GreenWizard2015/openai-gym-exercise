@@ -22,23 +22,25 @@ class CebLinear:
         self._samples.append((*step, 1))
     self._samples.append((*replay[-1], -1 if terminated else 0))
 
-    if self._sizeLimit < len(self._samples):
-      self.update()
+    self.update()
     return
 
   def update(self):
-    self._samples = self._samples[:self.maxSize]
+    if self._sizeLimit < len(self._samples):
+      self._samples = self._samples[-self.maxSize:]
     return 
     
   def __len__(self):
     return len(self._samples)
   
   def _fixRewardMultiplier(self, x):
-    return x
-    if isinstance(x, int):
+    if np.isscalar(x):
       return abs(x)
 
-    return[abs(y) for y in x]
+    if isinstance(x, (np.ndarray, np.generic)):
+      return np.abs(x)
+    
+    raise Exception('Unknown reward type. (%s)' % type(x))
   
   def _createBatch(self, batch_size, sampler):
     samplesLeft = batch_size
@@ -59,14 +61,13 @@ class CebLinear:
             res[i].append(value)
           res[-1].append(self._fixRewardMultiplier(sample[-1]))
           samplesLeft -= 1
-    #print(res)
     
     return [np.array(values) for values in res]
     
   def sampleBatch(self, batch_size):
     return self._createBatch(batch_size, lambda i: self._samples[i])
   
-  def sampleSequenceBatch(self, batch_size, sequenceLen):
+  def sampleSequenceBatch(self, batch_size, sequenceLen, **kwargs):
     def sampler(ind):
       sample = self._samples[ind:ind+sequenceLen]
       if not (sequenceLen == len(sample)): return None
