@@ -28,15 +28,22 @@ def emulateBatch(testEnvs, agent, maxSteps=math.inf):
         
   return [(replay, e.done) for replay, e in zip(replays, testEnvs)]
 
-def plotData2file(data, filename):
+def plotData2file(data, filename, maxCols=3):
   plt.clf()
-  _, axes = plt.subplots(nrows=len(data))
-  axes = axes if axes is list else [axes]
+  N = len(data)
+  rows = (N + maxCols - 1) // maxCols
+  cols = min((N, maxCols))
+  
+  figSize = plt.rcParams['figure.figsize']
+  fig = plt.figure(figsize=(figSize[0] * cols, figSize[1] * rows))
+  
+  axes = fig.subplots(ncols=cols, nrows=rows)
+  axes = axes.reshape((-1,)) if 1 < len(data) else [axes]
   for (chartname, series), axe in zip(data.items(), axes):
     for name, dataset in series.items():
       axe.plot(dataset, label=name)
     axe.title.set_text(chartname)
-  plt.legend()
-  plt.savefig(filename)
-  plt.close()
+    axe.legend()
+    
+  fig.savefig(filename)
   return
