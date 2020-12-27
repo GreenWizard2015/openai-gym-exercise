@@ -46,4 +46,5 @@ def plotData2file(data, filename, maxCols=3):
     axe.legend()
     
   fig.savefig(filename)
+  plt.close(fig)
   return
