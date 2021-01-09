@@ -1,5 +1,4 @@
 from Utils.Environment.EmptyWrapper import EmptyWrapper
-import numpy as np
 
 class DeltaRewardEnv(EmptyWrapper):
   def reset(self):
@@ -8,10 +7,11 @@ class DeltaRewardEnv(EmptyWrapper):
     
   def apply(self, *args):
     state, reward, done, prevState = self._env.apply(*args)
-    if np.isscalar(reward):
-      rewardDelta = reward if self._reward is None else reward - self._reward
+    
+    if self._reward is None:
+      rewardDelta = reward * 0.0 # preserve same type as reward
     else:
-      rewardDelta = np.zeros_like(reward) if self._reward is None else reward - self._reward
+      rewardDelta = reward - self._reward
 
     self._reward = reward
     return state, rewardDelta, done, prevState
