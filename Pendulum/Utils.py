@@ -13,9 +13,10 @@ def showAgentPlay(agent, speed=.01):
   env.hide()
   return
 
-def testAgent(agent, memory, episodes):
+def testAgent(agent, memory, episodes, processor=None):
   testEnvs = [PendulumEnvironment() for _ in range(episodes)]
   for replay, isDone in emulateBatch(testEnvs, agent):
+    replay = replay if processor is None else processor(replay)
     memory.addEpisode(replay, terminated=not isDone)
 
   return [x.score for x in testEnvs]

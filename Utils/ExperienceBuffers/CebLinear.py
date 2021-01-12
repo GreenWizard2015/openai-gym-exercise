@@ -64,7 +64,7 @@ class CebLinear:
     
     return [np.array(values) for values in res]
     
-  def sampleBatch(self, batch_size):
+  def sampleBatch(self, batch_size, **kwargs):
     return self._createBatch(batch_size, lambda i: self._samples[i])
   
   def sampleSequenceBatch(self, batch_size, sequenceLen, **kwargs):

@@ -1,0 +1,2 @@
+from .CCuriosityIR import CCuriosityIR
+from .CCuriosityIRWatched import CCuriosityIRWatched
