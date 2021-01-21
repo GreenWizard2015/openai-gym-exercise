@@ -4,7 +4,7 @@ import gym
 from math import sqrt
 
 class BasicPendulumEnvironment(ENV.EmptyWrapper):
-  def __init__(self, fixReward=False):
+  def __init__(self, fixReward=False, seed=None):
     env = gym.make("Pendulum-v0")
     self._forceScale = env.action_space.high
     self._maxSpeed = env.max_speed
@@ -12,7 +12,7 @@ class BasicPendulumEnvironment(ENV.EmptyWrapper):
     
     super().__init__(
       ENV.ProcessedStateEnv(
-        ENV.GymEnvironment(env),
+        ENV.GymEnvironment(env, seed=seed),
         processor=self._processState
       )
     )

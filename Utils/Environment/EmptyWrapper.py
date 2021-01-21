@@ -10,8 +10,8 @@ class EmptyWrapper:
     state, reward, done, prevState = self._env.apply(*args)
     return state, reward, done, prevState
   
-  def render(self):
-    return self._env.render()
+  def render(self, *args, **kwargs):
+    return self._env.render(*args, **kwargs)
   
   def hide(self):
     return self._env.hide()

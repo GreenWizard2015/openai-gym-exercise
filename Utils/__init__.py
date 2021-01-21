@@ -1,6 +1,7 @@
 import math
 import random
 import pylab as plt
+import matplotlib
 
 def emulate(env, agent, maxSteps=math.inf):
   env.reset()
@@ -48,3 +49,17 @@ def plotData2file(data, filename, maxCols=3):
   fig.savefig(filename)
   plt.close(fig)
   return
+
+def save_frames_as_gif(frames, filename, path='./'):
+  # FROM https://gist.github.com/botforge/64cbb71780e6208172bbf03cd9293553
+  #Mess with this to change frame size
+  plt.figure(figsize=(frames[0].shape[1] / 72.0, frames[0].shape[0] / 72.0), dpi=72)
+
+  patch = plt.imshow(frames[0])
+  plt.axis('off')
+
+  def animate(i):
+    patch.set_data(frames[i])
+
+  anim = matplotlib.animation.FuncAnimation(plt.gcf(), animate, frames = len(frames), interval=50)
+  anim.save(path + filename, writer='imagemagick', fps=60)

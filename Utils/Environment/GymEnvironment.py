@@ -1,11 +1,13 @@
 import gym
 
 class GymEnvironment:
-  def __init__(self, env):
+  def __init__(self, env, seed=None):
     self._env = gym.make(env) if isinstance(env, str) else env
+    self._seed = seed
     return
   
   def reset(self):
+    self._env.seed(self._seed)
     self._state = self._env.reset()
     self._done = False
     self._score = 0
@@ -19,8 +21,8 @@ class GymEnvironment:
     self._score += 0 if done else reward
     return state, reward, done, prevState
   
-  def render(self):
-    return self._env.render(mode='human')
+  def render(self, mode='human', *args, **kwargs):
+    return self._env.render(*args, mode=mode, **kwargs)
   
   def hide(self):
     return self._env.close()
