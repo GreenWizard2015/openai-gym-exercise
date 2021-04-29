@@ -15,28 +15,8 @@ from Utils.RandomAgent import RandomAgent
 from Utils.MappedActions import MappedActions
 
 from Pendulum.Dueling_DQN.trainingStage import train
-from Pendulum import Utils
+from Pendulum import Utils, DQNModels
 
-def createDuelingModel(input_shape, duelingInnerLayerSize, output_size=2):
-  keras = tf.keras
-  layers = tf.keras.layers
-  layersSize = [16, 16, output_size * 2]
-
-  inputs = res = layers.Input(shape=input_shape)
-  for sz in layersSize:
-    res = layers.Dense(sz, activation='relu')(res)
-
-  valueBranch = layers.Dense(duelingInnerLayerSize, activation='relu')(res)
-  valueBranch = layers.Dense(1, activation='linear')(valueBranch)
-  
-  actionsBranch = layers.Dense(duelingInnerLayerSize, activation='relu')(res)
-  actionsBranch = layers.Dense(output_size, activation='linear')(actionsBranch)
-  
-  res = layers.Lambda(
-    lambda x: x[1] + (x[0] - tf.reduce_mean(x[0], axis=-1, keepdims=True))
-  )([actionsBranch, valueBranch])
-  
-  return keras.Model(inputs=inputs, outputs=res)
 ##############
 metrics = {}
 
@@ -60,7 +40,7 @@ GAMMA = .9
 ACTIONS = MappedActions(N=9, valuesRange=(-1, 1))
 BOOTSTRAPPED_STEPS = 10
 
-model = createDuelingModel(input_shape=(3,), duelingInnerLayerSize=16, output_size=ACTIONS.N)
+model = DQNModels.createDuelingModel(input_shape=(3,), duelingInnerLayerSize=16, output_size=ACTIONS.N)
 model.compile(optimizer=tf.optimizers.Adam(lr=1e-4), loss='mean_squared_error')
 
 for epoch in range(EPOCHS):
