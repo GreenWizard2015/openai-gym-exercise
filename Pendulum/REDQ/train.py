@@ -73,7 +73,7 @@ for epoch in range(EPOCHS):
     )
     actions = ACTIONS.toIndex(actions)
     
-    _, loss = model.fit(states, actions, rewards, nextStates, nextStateScoreMultiplier)
+    _, loss = model.fit(states, actions, rewards, nextStates, nextStateScoreMultiplier * GAMMA)
     losses.append(loss)
     ######
     
