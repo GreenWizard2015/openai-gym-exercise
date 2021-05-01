@@ -2,15 +2,16 @@ import random
 import numpy as np
 import math
 import itertools
+from _collections import defaultdict
 
 _WEIGHTS_MODES = {
   'abs': math.fabs,
   'reward': lambda x: x,
-  'same': lambda _: 1
+  'same': None
 }
 
 class CebLinear:
-  def __init__(self, maxSize, sampleWeight='samp'):
+  def __init__(self, maxSize, sampleWeight='same'):
     self.maxSize = maxSize
     self._sizeLimit = math.floor(maxSize * 1.1)
     self._samples = []
@@ -44,25 +45,27 @@ class CebLinear:
   
   def _createBatch(self, batch_size, sampler):
     samplesLeft = batch_size
-    cumweights = list(itertools.accumulate(self._sampleWeight(x[2]) for x in self._samples))
+    cumweights = None
+    if self._sampleWeight:
+      cumweights = list(itertools.accumulate(self._sampleWeight(x[2]) for x in self._samples))
+      
     indexRange = np.arange(len(self._samples)) 
-    res = []
+    res = defaultdict(list)
     while 0 < samplesLeft:
       indexes = set(random.choices(
         indexRange, cum_weights=cumweights,
         k=min((samplesLeft, len(self._samples)))
       ))
-      
-      for i in indexes:
-        sample = sampler(i)
+
+      for sInd in indexes:
+        sample = sampler(sInd)
         if sample:
-          while len(res) < len(sample):  res.append([])
           for i, value in enumerate(sample[:-1]):
             res[i].append(value)
-          res[-1].append(self._fixRewardMultiplier(sample[-1]))
+          res[len(sample) - 1].append(self._fixRewardMultiplier(sample[-1]))
           samplesLeft -= 1
     
-    return [np.array(values) for values in res]
+    return [np.array(values) for values in res.values()]
     
   def sampleBatch(self, batch_size, **kwargs):
     return self._createBatch(batch_size, lambda i: self._samples[i])
