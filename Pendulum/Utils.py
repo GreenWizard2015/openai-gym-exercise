@@ -2,8 +2,8 @@ from Pendulum.PendulumEnvironment import PendulumEnvironment
 import time
 from Utils import emulateBatch
 
-def showAgentPlay(agent, speed=.01):
-  env = PendulumEnvironment()
+def showAgentPlay(agent, speed=.01, env=PendulumEnvironment):
+  env = env()
   env.reset()
   while not env.done:
     env.apply(agent.process(env.state))
@@ -13,8 +13,8 @@ def showAgentPlay(agent, speed=.01):
   env.hide()
   return
 
-def testAgent(agent, memory, episodes, processor=None):
-  testEnvs = [PendulumEnvironment() for _ in range(episodes)]
+def testAgent(agent, memory, episodes, processor=None, env=PendulumEnvironment):
+  testEnvs = [env() for _ in range(episodes)]
   for replay, isDone in emulateBatch(testEnvs, agent):
     replay = replay if processor is None else processor(replay)
     memory.addEpisode(replay, terminated=not isDone)

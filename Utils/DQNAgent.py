@@ -14,7 +14,7 @@ class DQNAgent:
     return self.processBatch([state])[0]
     
   def processBatch(self, states):
-    actions = self._model.predict(np.array(states))
+    actions = self._model(np.array(states)).numpy()
     if 0 < self._exploreRate:
       rndIndexes = np.where(np.random.random_sample((actions.shape[0], )) < self._exploreRate)
       actions[rndIndexes] = np.random.random_sample(actions.shape)[rndIndexes]
